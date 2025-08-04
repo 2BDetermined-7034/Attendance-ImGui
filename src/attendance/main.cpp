@@ -45,7 +45,7 @@ int main() {
 	style.FontScaleDpi = 1.5f; 
 
 	style.FontSizeBase = 15.0f;
-	if (!io.Fonts->AddFontFromFileTTF("font.ttf")) {
+	if (!io.Fonts->AddFontFromFileTTF("resources/font.ttf")) {
 		std::cout << errorText << "Could not load font" << std::endl;
 		return 0;
 	}
@@ -128,7 +128,7 @@ int main() {
 
 		/*
 		 * If the application is left on for over 24 hours, reset the clock.
-		 * TODO Move this logic to execute after signing everone out at ~9-10 automatically
+		 * TODO Move this logic to execute after signing everyone out at ~9-10 automatically
 		 */
 		if (glfwGetTime() > 3600.0f * 12.0f) {
 			selector.resetClock();

@@ -58,9 +58,9 @@ public:
 private:
 	mstd::Status version1(std::ifstream& file, mstd::U16 revision);
 
-	static constexpr std::array versions = {
-		&Database::version1
-	};
+	using V = std::function<mstd::Status(Database*, std::ifstream&, mstd::U16)>;
+
+	static std::vector<V> versions;
 };
 
 #endif
