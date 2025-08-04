@@ -34,7 +34,5 @@ void backupRestore(Database& db) {
 
 	filepath = "backup" + std::to_string(i - 2) + ".db2";
 
-	std::cout << "restored " << filepath << std::endl;
-
 	db.read(filepath);
 }
