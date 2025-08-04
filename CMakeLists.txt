@@ -20,13 +20,12 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(mstd)
 
 FetchContent_Declare(
-	SFML
-	GIT_REPOSITORY https://github.com/SFML/SFML.git
-	GIT_TAG 3.0.1
+	glfw
+	GIT_REPOSITORY https://github.com/glfw/glfw.git
 	EXCLUDE_FROM_ALL
 	SYSTEM
 )
-FetchContent_MakeAvailable(SFML)
+FetchContent_MakeAvailable(glfw)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
@@ -34,6 +33,8 @@ file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "inc" "*.hpp" "*.h")
 
 add_executable(attendance)
 add_subdirectory(src/attendance)
+add_subdirectory(src/imgui)
+add_subdirectory(src/glad)
 target_include_directories(attendance PUBLIC inc/)
-target_link_libraries(attendance PRIVATE SFML::System SFML::Window SFML::Graphics SFML::Network mstd)
+target_link_libraries(attendance PRIVATE mstd glfw)
 set_target_properties(attendance PROPERTIES CXX_STANDARD 20)

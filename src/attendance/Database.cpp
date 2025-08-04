@@ -4,6 +4,7 @@
 #include <iostream>
 #include <functional>
 #include <mstd/memory>
+#include <GLFW/glfw3.h>
 
 static void logError(const std::string& filepath, const std::string& error) {
 	std::cerr << errorText << "Could not open file \"" << filepath << "\" " << error << std::endl;
@@ -120,6 +121,9 @@ mstd::Status Database::version1(std::ifstream& file, mstd::U16 revision) {
 
 	students.resize(subHeader.studentCount);
 	file.read((C8*)students.data(), students.size() * sizeof(Student));
+
+	firstNames.clear();
+	lastNames.clear();
 	firstNames.reserve(students.size());
 	lastNames.reserve(students.size());
 
