@@ -7,7 +7,17 @@
 #include <imgui/imgui_impl_opengl3.h>
 
 #include <attendance/Database.hpp>
+#include <attendance/StudentSelector.hpp>
+#include <attendance/backup.hpp>
+#include <attendance/AddStudent.hpp>
+
 #include <iostream>
+#include <functional>
+
+mstd::I32 focused = 1;
+void focusCallback(GLFWwindow* window, mstd::I32 f) {
+	focused = f;
+}
 
 int main() {
 	using namespace mstd;
@@ -29,6 +39,16 @@ int main() {
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
 	ImGuiIO& io = ImGui::GetIO();
+	ImGui::StyleColorsDark();
+	ImGuiStyle& style = ImGui::GetStyle();
+	style.ScaleAllSizes(1.5f);
+	style.FontScaleDpi = 1.5f; 
+
+	style.FontSizeBase = 15.0f;
+	if (!io.Fonts->AddFontFromFileTTF("font.ttf")) {
+		std::cout << errorText << "Could not load font" << std::endl;
+		return 0;
+	}
 
 	ImGui_ImplGlfw_InitForOpenGL(window, true);
 	ImGui_ImplOpenGL3_Init();
@@ -36,8 +56,20 @@ int main() {
 	// Enable V-Sync
 	glfwSwapInterval(1);
 
+	Database db;
+	db.read("database.db2");
+
+	StudentSelector selector(db);
+	AddStudent addStudent(db);
+
+	glfwSetWindowFocusCallback(window, focusCallback);
+	
+	I32 width, height;
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
+		if (!focused) {
+			continue;
+		}
 
 		ImGui_ImplOpenGL3_NewFrame();
 		ImGui_ImplGlfw_NewFrame();
@@ -45,12 +77,71 @@ int main() {
 
 		glClear(GL_COLOR_BUFFER_BIT);
 
-		ImGui::ShowDemoWindow();
+		ImGui::BeginMainMenuBar();
+		if (ImGui::BeginMenu("File")) {
+			if (ImGui::MenuItem("Save")) {
+				db.write("database.db2");
+			}
+			if (ImGui::MenuItem("Backup")) {
+				backupCreate(db);
+			}
+			if (ImGui::MenuItem("Restore")) {
+				backupRestore(db);
+			}
+			if (ImGui::MenuItem("Exit")) {
+				glfwSetWindowShouldClose(window, GLFW_TRUE);
+			}
+			ImGui::EndMenu();
+		}
+		if (ImGui::BeginMenu("Edit")) {
+			if (ImGui::BeginMenu("Add Student")) {
+				addStudent.render();
+				ImGui::EndMenu();
+			}
+			if (ImGui::MenuItem("Sign All Out")) {
+				for (Size i = 0; i < db.students.size(); ++i) {
+					selector.signOut(i);
+				}
+			}
+			ImGui::EndMenu();
+		}
+		ImGui::EndMainMenuBar();
+
+		Bool isOpen;
+		ImGui::Begin("Main", &isOpen,
+			ImGuiWindowFlags_NoMove |
+			ImGuiWindowFlags_NoResize |
+			ImGuiWindowFlags_NoCollapse |
+			ImGuiWindowFlags_NoTitleBar
+		);
+
+		ImGui::SetWindowPos({0, 32});
+		ImGui::SetWindowSize(io.DisplaySize);
+
+		selector.render();
+
+		ImGui::End();
+
 		ImGui::Render();
-		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        glClear(GL_COLOR_BUFFER_BIT);
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+
+		/*
+		 * If the application is left on for over 24 hours, reset the clock.
+		 * TODO Move this logic to execute after signing everone out at ~9-10 automatically
+		 */
+		if (glfwGetTime() > 3600.0f * 12.0f) {
+			selector.resetClock();
+		}
 
 		glfwSwapBuffers(window);
 	}
+
+	for (Size i = 0; i < db.students.size(); ++i) {
+		selector.signOut(i);
+	}
+
+	db.write("database.db2");
 
 	glfwTerminate();
 
