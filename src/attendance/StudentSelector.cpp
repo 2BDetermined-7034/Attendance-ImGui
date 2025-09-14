@@ -70,13 +70,14 @@ void StudentSelector::render() {
 
 		ImGui::SameLine();
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, {0.3, 0});
-		if (ImGui::Button("\ueaf8", {35, 0})) {
+		if (ImGui::Button("Settings")) {
 			settings.toggle(i);
 		}
 		ImGui::PopStyleVar();
 		
 		ImGui::SameLine();
-		if (ImGui::Button("\ue725", {35, 0})) {
+		if (ImGui::Button("Skills")) {
+			skills.toggle(i);
 		}
 		
 		ImGui::PopID();

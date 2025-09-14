@@ -3,10 +3,12 @@
 
 #include <attendance/Database.hpp>
 #include <attendance/StudentSettings.hpp>
+#include <attendance/StudentSkills.hpp>
 
 class StudentSelector {
 public:
-	StudentSelector(Database& db, StudentSettings& settings) : db(db), settings(settings) {
+	StudentSelector(Database& db, StudentSettings& settings, StudentSkills& skills)
+		: db(db), settings(settings), skills(skills) {
 		students.resize(db.students.size());
 		std::fill(search, search + sizeof(search), '\0');
 	}
@@ -35,6 +37,7 @@ private:
 
 	Database& db;
 	StudentSettings& settings;
+	StudentSkills& skills;
 	std::vector<StudentRuntimeData> students;
 	mstd::C8 search[128];
 };

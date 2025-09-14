@@ -50,6 +50,8 @@ public:
 		 *
 		 *  enum class softwareMask;
 		 */
+
+		mstd::U8 software[4];
 	};
 
 	std::vector<Student> students;

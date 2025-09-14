@@ -11,6 +11,7 @@
 #include <attendance/backup.hpp>
 #include <attendance/AddStudent.hpp>
 #include <attendance/StudentSettings.hpp>
+#include <attendance/StudentSkills.hpp>
 
 #include <iostream>
 #include <functional>
@@ -62,7 +63,8 @@ int main() {
 
 	AddStudent addStudent(db);
 	StudentSettings settings(db);
-	StudentSelector selector(db, settings);
+	StudentSkills skills(db);
+	StudentSelector selector(db, settings, skills);
 
 	glfwSetWindowFocusCallback(window, focusCallback);
 	
@@ -143,6 +145,7 @@ int main() {
 
 		selector.render();
 		settings.render();
+		skills.render();
 
 		ImGui::End();
 

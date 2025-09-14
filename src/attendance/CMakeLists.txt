@@ -6,4 +6,5 @@ target_sources(
 	${CMAKE_CURRENT_SOURCE_DIR}/backup.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/AddStudent.cpp
 	${CMAKE_CURRENT_SOURCE_DIR}/StudentSettings.cpp
+	${CMAKE_CURRENT_SOURCE_DIR}/StudentSkills.cpp
 )
