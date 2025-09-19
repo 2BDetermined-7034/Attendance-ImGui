@@ -51,7 +51,10 @@ public:
 		 *  enum class softwareMask;
 		 */
 
+		mstd::U8 mechanical[4] = {0};
+		mstd::U8 electrical[5] = {0};
 		mstd::U8 software[4] = {0};
+		mstd::U8 outreach[5] = {0};
 		mstd::U8 business[4] = {0};
 	};
 

@@ -30,8 +30,9 @@ private:
 		std::vector<const char*> nodes;
 	};
 
-	static std::vector<Category> software;
-	static std::vector<Category> business;
+	static std::vector<Category>
+		design, mechanical, manufacturing, electrical, software, marketing, outreach, business;
+
 	void renderSubteams(std::function<void(std::vector<Category>&, mstd::U8*)> f);
 	void renderSubteamStudent(std::vector<Category>& categories, mstd::U8* data);
 	void renderSubteamAdmin(std::vector<Category>& categories, mstd::U8* data);

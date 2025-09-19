@@ -3,6 +3,53 @@
 #include <imgui/imgui.h>
 #include <iostream>
 
+std::vector<StudentSkills::Category> StudentSkills::electrical = {
+	{
+		.name = "Tools",
+		.nodes = {
+			"Learning names",
+			"Electrical Safety",
+			"Using a multimeter",
+			"Battery capacity tester",
+		},
+	},
+	{
+		.name = "FRC Processes",
+		.nodes = {
+			"Learning the names of FRC components",
+			"Wire a motor to Bobert (spaghetti bot)",
+			"Robot schematic/wiring table",
+			"Troubleshooting exercise in a controlled environment",
+			"FRC Electrical Inspection",
+		},
+	},
+	{
+		.name = "Theoretical Knowledge",
+		.nodes = {
+			"Ohm’s law",
+			"Power law",
+			"Kirchoff’s Voltage and Current Laws",
+			"DC vs. AC Power",
+			"Learn about logic gates",
+		},
+	},
+	{
+		.name = "Electrial Engineering",
+		.nodes = {
+			"Lighting an LED with arduino",
+			"Motor operation and theory",
+			"PCB Design and Applications",
+			"Passive Components",
+			"Resistors, Resistivity, Color Codes, etc.",
+			"Capacitors, Capacitance, Dielectric, etc",
+			"Inductors, Inductance, Magnetism, etc. ",
+			"Diodes!",
+			"Control Theory",
+			"Semiconductors",
+		}
+	},
+};
+
 std::vector<StudentSkills::Category> StudentSkills::software = {
 	{
 		.name = "General Skills",
@@ -10,7 +57,7 @@ std::vector<StudentSkills::Category> StudentSkills::software = {
 			"Driver Station", 
 			"Phoenix Tuner", 
 			"Camera Calibration", 
-			"Radio Flashing"
+			"Radio Flashing",
 		},
 	},
 	{
@@ -18,16 +65,65 @@ std::vector<StudentSkills::Category> StudentSkills::software = {
 		.nodes = {
 			"PID Loops", 
 			"Feedforward Types", 
-			"Trapezoidal Motion"
+			"Trapezoidal Motion",
 		},
 	},
 	{
 		.name = "Programming",
 		.nodes = {
 			"Basic Java", 
-			"Command-based & Lambdas"
+			"Command-based & Lambdas",
 		},
 	},
+};
+
+std::vector<StudentSkills::Category> StudentSkills::outreach = {
+	{
+		.name = "General Skills",
+		.nodes = {
+			"Learn the whole spiel to give to literally everyone at all times :)",
+			"General email etiquette (sign offs, being formal, etc.)",
+			"General Google Sheets skills",
+			"Basic photography",
+		}
+	},
+	{
+		.name = "Camps",
+		.nodes = {
+			"Choosing dates",
+			"Google forms + email notifications for forms",
+			"Creating planning sheets",
+			"Choosing lessons + organizing teachers/lessons",
+			"Notifying the team + camper parents (help marketing media release)",
+			"Put people in groups WITHOUT parents yelling at you",
+			"Basic Canva - posters, nametags, etc.",
+		}
+	},
+	{
+		.name = "Impact",
+		.nodes = {
+			"Brainstorming/creating a theme",
+			"Outlining - creating flow, choosing what events to mention, etc.",
+			"Actually writing the essay - word choice, writing clearly and persuasively",
+			"Editing!",
+			"Presentation/video - conveying ideas in an engaging way",
+			"Memorizing scripts",
+			"Video filming",
+			"Video editing",
+			"Answering judge’s questions",
+		}
+	},
+	{
+		.name = "Other Events",
+		.nodes = {
+			"Choosing dates",
+			"Google forms",
+			"Creating planning sheets",
+			"Organizing staff",
+			"Notifying the team",
+			"Finding materials etc.",
+		}
+	}
 };
 
 std::vector<StudentSkills::Category> StudentSkills::business = {
@@ -39,7 +135,7 @@ std::vector<StudentSkills::Category> StudentSkills::business = {
 			"Visit in-person",
 			"Create sponsorship paraphernalia",
 			"Find grants",
-			"Fill out grants"
+			"Fill out grants",
 		},
 	},
 	{
@@ -58,11 +154,10 @@ std::vector<StudentSkills::Category> StudentSkills::business = {
 			"Build a budget",
 			"SWOT analysis",
 			"Make a business plan",
-			"Business summary"
+			"Business summary",
 		},
 	},
 };
-
 
 void StudentSkills::render() {
 	using namespace mstd;
@@ -95,8 +190,16 @@ void StudentSkills::renderSubteams(std::function<void(std::vector<Category>&, ms
 	Database::Student& s = db.students[studentIndex];
 
 	if (ImGui::BeginTabBar("Subteams")) {
+		if (ImGui::BeginTabItem("Electrical")) {
+			f(electrical, s.electrical);
+			ImGui::EndTabItem();
+		}
 		if (ImGui::BeginTabItem("Software")) {
 			f(software, s.software);
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Outreach")) {
+			f(outreach, s.outreach);
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Business")) {
