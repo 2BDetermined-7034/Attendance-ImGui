@@ -23,14 +23,14 @@ public:
 		friend class Database;
 
 	public:
-		mstd::F32 labHours;
-		mstd::F32 solveHours;
-		mstd::F32 campHours;
-		mstd::F32 otherHours;
+		mstd::F32 labHours = 0.0f;
+		mstd::F32 solveHours = 0.0f;
+		mstd::F32 campHours = 0.0f;
+		mstd::F32 otherHours = 0.0f;
 
-		mstd::U32 solveEvents;
-		mstd::U32 camps;
-		mstd::U32 other;
+		mstd::U32 solveEvents = 0.0f;
+		mstd::U32 camps = 0.0f;
+		mstd::U32 other = 0.0f;
 
 		/*
 		 * TODO: Add skill tree data here.
@@ -51,7 +51,8 @@ public:
 		 *  enum class softwareMask;
 		 */
 
-		mstd::U8 software[4];
+		mstd::U8 software[4] = {0};
+		mstd::U8 business[4] = {0};
 	};
 
 	std::vector<Student> students;

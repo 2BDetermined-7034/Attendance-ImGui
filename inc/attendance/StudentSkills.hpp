@@ -18,31 +18,26 @@ public:
 		enabled ^= 1;
 
 		name = db.firstNames[studentIndex] + " " + db.lastNames[studentIndex];
+
+		const Database::Student& s = db.students[studentIndex];
 	}
 
 	mstd::Bool hasAdmin;
 
 private:
-
-	static constexpr const char* softwareCategories[] = {
-		"General Skills",
-		"Control Theory",
-		"Programming"
-	};
-	
-	// nullptr is a delimiter in this array
-	static constexpr const char* softwareNodes[] = {
-		"Driver Station", "Phoenix Tuner", "Camera Calibration", "Radio Flashing", nullptr,
-		"PID Loops", "Feedforward Types", "Trapezoidal Motion", nullptr,
+	struct Category {
+		const char* name;
+		std::vector<const char*> nodes;
 	};
 
-	void renderAdmin();
-	void renderStudent();
+	static std::vector<Category> software;
+	static std::vector<Category> business;
+	void renderSubteams(std::function<void(std::vector<Category>&, mstd::U8*)> f);
+	void renderSubteamStudent(std::vector<Category>& categories, mstd::U8* data);
+	void renderSubteamAdmin(std::vector<Category>& categories, mstd::U8* data);
 
 	mstd::Size studentIndex;
 	mstd::Bool enabled;
-
-	std::array<mstd::Bool, sizeof(softwareNodes) / sizeof(softwareNodes[0])> completed;
 
 	std::string name;
 	Database& db;

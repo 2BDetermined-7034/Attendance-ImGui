@@ -120,12 +120,14 @@ int main() {
 				) {
 					if (password == std::string("7034")) {
 						settings.hasAdmin = true;
+						skills.hasAdmin = true;
 					}
 				}
 				ImGui::EndMenu();
 			}
 			if (ImGui::MenuItem("Sign Out")) {
 				settings.hasAdmin = false;
+				skills.hasAdmin = false;
 			}
 			ImGui::EndMenu();
 		}
