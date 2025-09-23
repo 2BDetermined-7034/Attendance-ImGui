@@ -69,7 +69,16 @@ void StudentSelector::render() {
 		ImGui::PushID(name.c_str());
 
 		ImGui::SameLine();
-		ImGui::Text("%f", db.students[i].labHours);
+		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, {0.3, 0});
+		if (ImGui::Button("Settings")) {
+			settings.toggle(i);
+		}
+		ImGui::PopStyleVar();
+		
+		ImGui::SameLine();
+		if (ImGui::Button("Skills")) {
+			skills.toggle(i);
+		}
 		
 		ImGui::PopID();
 	}
@@ -113,7 +122,7 @@ void StudentSelector::resetClock() {
 	for (Size i = 0; i < students.size(); ++i) {
 		if (!students[i].present) continue;
 
-		db.students[i].labHours += glfwGetTime() - students[i].signInTime;
+		db.students[i].labHours += (glfwGetTime() - students[i].signInTime) / 3600.0f;
 	}
 
 	glfwSetTime(0.0f);

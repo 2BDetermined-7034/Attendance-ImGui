@@ -10,6 +10,8 @@
 #include <attendance/StudentSelector.hpp>
 #include <attendance/backup.hpp>
 #include <attendance/AddStudent.hpp>
+#include <attendance/StudentSettings.hpp>
+#include <attendance/StudentSkills.hpp>
 
 #include <iostream>
 #include <functional>
@@ -45,7 +47,7 @@ int main() {
 	style.FontScaleDpi = 1.5f; 
 
 	style.FontSizeBase = 15.0f;
-	if (!io.Fonts->AddFontFromFileTTF("font.ttf")) {
+	if (!io.Fonts->AddFontFromFileTTF("resources/font.ttf")) {
 		std::cout << errorText << "Could not load font" << std::endl;
 		return 0;
 	}
@@ -59,8 +61,10 @@ int main() {
 	Database db;
 	db.read("database.db2");
 
-	StudentSelector selector(db);
 	AddStudent addStudent(db);
+	StudentSettings settings(db);
+	StudentSkills skills(db);
+	StudentSelector selector(db, settings, skills);
 
 	glfwSetWindowFocusCallback(window, focusCallback);
 	
@@ -105,6 +109,28 @@ int main() {
 			}
 			ImGui::EndMenu();
 		}
+		if (ImGui::BeginMenu("Admin")) {
+			if (ImGui::BeginMenu("Sign In")) {
+				if (
+					char password[64] = "";
+					ImGui::InputText(
+						"Password", password, 64,
+						ImGuiInputTextFlags_Password | ImGuiInputTextFlags_EnterReturnsTrue
+					)
+				) {
+					if (password == std::string("7034")) {
+						settings.hasAdmin = true;
+						skills.hasAdmin = true;
+					}
+				}
+				ImGui::EndMenu();
+			}
+			if (ImGui::MenuItem("Sign Out")) {
+				settings.hasAdmin = false;
+				skills.hasAdmin = false;
+			}
+			ImGui::EndMenu();
+		}
 		ImGui::EndMainMenuBar();
 
 		Bool isOpen;
@@ -112,13 +138,16 @@ int main() {
 			ImGuiWindowFlags_NoMove |
 			ImGuiWindowFlags_NoResize |
 			ImGuiWindowFlags_NoCollapse |
-			ImGuiWindowFlags_NoTitleBar
+			ImGuiWindowFlags_NoTitleBar |
+			ImGuiWindowFlags_NoBringToFrontOnFocus
 		);
 
 		ImGui::SetWindowPos({0, 32});
 		ImGui::SetWindowSize(io.DisplaySize);
 
 		selector.render();
+		settings.render();
+		skills.render();
 
 		ImGui::End();
 
@@ -127,11 +156,12 @@ int main() {
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		/*
-		 * If the application is left on for over 24 hours, reset the clock.
-		 * TODO Move this logic to execute after signing everone out at ~9-10 automatically
+		 * If the application is left on for over an hour, reset the clock and autosave.
+		 * TODO Move this logic to execute after signing everyone out at ~9-10 automatically
 		 */
-		if (glfwGetTime() > 3600.0f * 12.0f) {
+		if (glfwGetTime() > 3600.0f) {
 			selector.resetClock();
+			db.write("database.db2");
 		}
 
 		glfwSwapBuffers(window);

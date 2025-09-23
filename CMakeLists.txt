@@ -27,6 +27,16 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(glfw)
 
+function(add_resource path)
+	configure_file(
+		${CMAKE_CURRENT_SOURCE_DIR}/resources/${path}
+		${CMAKE_CURRENT_BINARY_DIR}/resources/${path}
+		COPYONLY
+	)
+endfunction()
+
+add_resource(font.ttf)
+
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS "inc" "*.hpp" "*.h")

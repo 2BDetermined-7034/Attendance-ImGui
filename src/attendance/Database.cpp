@@ -10,6 +10,10 @@ static void logError(const std::string& filepath, const std::string& error) {
 	std::cerr << errorText << "Could not open file \"" << filepath << "\" " << error << std::endl;
 }
 
+std::vector<Database::V> Database::versions = {
+	&Database::version1
+};
+
 /*
  * Adding new versions:
  * First, decide if your changes are significant enough that they constitute a new function.
@@ -51,7 +55,7 @@ mstd::Status Database::read(const std::string& filepath) {
 	}
 
 	auto versionFunc = versions[header.version - 1];
-	if ((this->*versionFunc)(file, header.revision)) {
+	if ((versionFunc)(this, file, header.revision)) {
 		return 1;
 	}
 
