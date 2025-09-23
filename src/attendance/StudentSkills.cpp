@@ -3,6 +3,191 @@
 #include <imgui/imgui.h>
 #include <iostream>
 
+std::vector<StudentSkills::Category> StudentSkills::design = {
+	{
+		.name = "Navigate Fusion",
+		.nodes = {
+			"Have a Fusion account and access to the team",
+			"Navigate the Fusion team",
+			"Use mouse functions + effectively view and navigate a fusion model",
+			"Measure and build robot subsystems using a reference model",
+			"Use read only for me, save, and use versions and version history",
+			"Have completed the CAD Standardization lesson",
+		},
+	},
+	{
+		.name = "Use Fusion as a tool",
+		.nodes = {
+			"Have completed Fusion 101-102 lesson",
+			"Know how to change units",
+			"Create and edit sketches",
+			"Use constraints, projections, etc",
+			"Use extrusions and direct 3D objects",
+			"Use correct file types and download files for 3D printing and laser cutting",
+			"Download and import components from vendors",
+			"Use tolerances for different materials",
+		}
+	},
+	{
+		.name = "CAD Parts",
+		.nodes = {
+			"Create drawings from designs",
+			"Create bill of materials",
+			"Use and properly constrain joints",
+			"Use external components",
+			"Derive components and bodies",
+			"Use mirrors and patterns",
+			"Use fillets and chamfers",
+			"Use splits and combines",
+			"Use assembly contexts",
+		}
+	},
+	{
+		.name = "CAD Complex Parts",
+		.nodes = {
+			"Create bodies out of sheet metal: flanges, bends, and flat patterns",
+			"View and edit sheet metal rules",
+			"Use parameters",
+			"Construct planes and points",
+			"Use section analysis",
+			"Copy/paste CAM",
+			"Post process existing CAM files and print setup sheets",
+		},
+	},
+	{
+		.name = "CAD Subsystems",
+		.nodes = {
+			"System integrate",
+			"Display center of mass, mass, volume, moment of inertia",
+			"Change densities, physical materials, and appearances",
+			"Render designs",
+			"Create and analyze static stress simulations",
+			"CAM for the Camaster: bores and 2D contour",
+		}
+	}
+};
+
+std::vector<StudentSkills::Category> StudentSkills::manufacturing = {
+	{
+		.name = "Horizontal Bandsaw Safety",
+		.nodes = {
+			"Blade guard",
+			"Listen for noises",
+			"Push stick",
+		}
+	},
+	{
+		.name = "Horizontal Bandsaw Running",
+		.nodes = {
+			"Push stick",
+			"Push assists",
+		}
+	},
+	{
+		.name = "Horizontal Bandsaw Maintenance",
+		.nodes = {
+			"Blade cleaning",
+			"Blade changing",
+		}
+	},
+	{
+		.name = "Vertical Bandsaw Running",
+		.nodes = {
+			"Coolant",
+			"Jack stand",
+			"Speed",
+			"Clamp all the way",
+		}
+	},
+	{
+		.name = "Vertical Bandsaw Maintenance",
+		.nodes = {
+			"Fill coolant",
+			"Change blade",
+		}
+	},
+	{
+		.name = "Lathe Safety",
+		.nodes = {
+			"TAKE THE KEY OUT",
+		}
+	},
+	{
+		.name = "Lathe Running",
+		.nodes = {
+			"Speeds and feeds",
+			"Tools",
+			"Types of operations",
+		}
+	},
+	{
+		.name = "Lathe Maintenance",
+		.nodes = {
+			"Clean steel regularly (keep dry and rust free)",
+			"Ensure bits on tools are sharp",
+		}
+	},
+	{
+		.name = "CAMaster Safety",
+		.nodes = {
+			"E-stop",
+			"Screw in correctly",
+		}
+	},
+	{
+		.name = "CAMaster Running",
+		.nodes = {
+			"Change tools",
+			"Touch top ",
+			"Tubes",
+			"Sheets",
+			"Run machine",
+			"With supervision",
+			"Without supervision but checks",
+			"Completely free"
+		}
+	},
+	{
+		.name = "CAMaster Maintenance",
+		.nodes = {
+			"Coolant filling",
+			"Getting new tools",
+			"Turn off all the way safely",
+		}
+	},
+	{
+		.name = "CAMaster CAM",
+		.nodes = {
+			"With help",
+			"Without help",
+		}
+	},
+	{
+		.name = "Tormach Safety",
+		.nodes = {
+			"Running",
+			"With supervision",
+			"Without supervision but checks",
+			"Completely free",
+		}
+	},
+	{
+		.name = "Tormach Maintenance",
+		.nodes = {
+			"Oil skimmer",
+			"Cleaning aluminum off",
+			"Changing tools in tool holders",
+		}
+	},
+	{
+		.name = "Tormach CAM",
+		.nodes = {
+			"With help",
+			"Without help",
+		}
+	}
+};
+
 std::vector<StudentSkills::Category> StudentSkills::electrical = {
 	{
 		.name = "Tools",
@@ -159,6 +344,49 @@ std::vector<StudentSkills::Category> StudentSkills::business = {
 	},
 };
 
+std::vector<StudentSkills::Category> StudentSkills::safety = {
+	{
+		.name = "General",
+		.nodes = {
+			"Fill out MIFS",
+			"General Safety Training",
+			"Safety Audit",
+			"Enter MIFs into sheet",
+		}
+	},
+	{
+		.name = "Emergancy",
+		.nodes = {
+			"Emergency safety training",
+			"Check first aid kit",
+			"Knows all of the lab procedures",
+			"First Aid trained",
+			"CPR trained",
+		}
+	},
+	{
+		.name = "Competition",
+		.nodes = {
+			"Pack safety bin",
+			"Is able to talk to other teams about safety",
+			"Know all of our procedures to talk in detail to other teams",
+			"Is the designated safety captain",
+		}
+	},
+	{
+		.name = "Organization",
+		.nodes = {
+			"Organize the safety cubbies",
+			"Knowing the inventory",
+			"Order supplies",
+			"Teaching trainings",
+			"Keep all materials updated",
+			"Write safety audits",
+			"Keep track of injuries recurring or not",
+		}
+	}
+};
+
 void StudentSkills::render() {
 	using namespace mstd;
 
@@ -190,6 +418,14 @@ void StudentSkills::renderSubteams(std::function<void(std::vector<Category>&, ms
 	Database::Student& s = db.students[studentIndex];
 
 	if (ImGui::BeginTabBar("Subteams")) {
+		if (ImGui::BeginTabItem("Design")) {
+			f(design, s.design);
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Manufacturing")) {
+			f(manufacturing, s.manufacturing);
+			ImGui::EndTabItem();
+		}
 		if (ImGui::BeginTabItem("Electrical")) {
 			f(electrical, s.electrical);
 			ImGui::EndTabItem();
@@ -204,6 +440,10 @@ void StudentSkills::renderSubteams(std::function<void(std::vector<Category>&, ms
 		}
 		if (ImGui::BeginTabItem("Business")) {
 			f(business, s.business);
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Safety")) {
+			f(safety, s.safety);
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();

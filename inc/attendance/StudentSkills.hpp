@@ -31,7 +31,7 @@ private:
 	};
 
 	static std::vector<Category>
-		design, mechanical, manufacturing, electrical, software, marketing, outreach, business;
+		design, mechanical, manufacturing, electrical, software, marketing, outreach, business, safety;
 
 	void renderSubteams(std::function<void(std::vector<Category>&, mstd::U8*)> f);
 	void renderSubteamStudent(std::vector<Category>& categories, mstd::U8* data);

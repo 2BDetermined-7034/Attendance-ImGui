@@ -32,30 +32,15 @@ public:
 		mstd::U32 camps = 0.0f;
 		mstd::U32 other = 0.0f;
 
-		/*
-		 * TODO: Add skill tree data here.
-		 * I think it could also be a couple U8s if the trees within each sub-team don't
-		 * intersect themselves.
-		 * Or a bitmask.
-		 *
-		 * e.g.
-		 *
-		 * struct {
-		 * U8 generalSkills;
-		 * U8 controlTheory;
-		 * U8 programming;
-		 * } software;
-		 *
-		 * --or--
-		 *
-		 *  enum class softwareMask;
-		 */
-
+		mstd::U8 design[6] = {0};
+		mstd::U8 manufacturing[16] = {0};
 		mstd::U8 mechanical[4] = {0};
 		mstd::U8 electrical[5] = {0};
 		mstd::U8 software[4] = {0};
+		mstd::U8 marketing[5] = {0};
 		mstd::U8 outreach[5] = {0};
 		mstd::U8 business[4] = {0};
+		mstd::U8 safety[4] = {0};
 	};
 
 	std::vector<Student> students;
