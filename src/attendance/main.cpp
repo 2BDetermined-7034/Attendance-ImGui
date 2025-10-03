@@ -97,17 +97,19 @@ int main() {
 			}
 			ImGui::EndMenu();
 		}
-		if (ImGui::BeginMenu("Edit")) {
-			if (ImGui::BeginMenu("Add Student")) {
-				addStudent.render();
+		if (settings.hasAdmin) {
+			if (ImGui::BeginMenu("Edit")) {
+				if (ImGui::BeginMenu("Add Student")) {
+					addStudent.render();
+					ImGui::EndMenu();
+				}
+				if (ImGui::MenuItem("Sign All Out")) {
+					for (Size i = 0; i < db.students.size(); ++i) {
+						selector.signOut(i);
+					}
+				}
 				ImGui::EndMenu();
 			}
-			if (ImGui::MenuItem("Sign All Out")) {
-				for (Size i = 0; i < db.students.size(); ++i) {
-					selector.signOut(i);
-				}
-			}
-			ImGui::EndMenu();
 		}
 		if (ImGui::BeginMenu("Admin")) {
 			if (ImGui::BeginMenu("Sign In")) {
@@ -152,8 +154,8 @@ int main() {
 		ImGui::End();
 
 		ImGui::Render();
-        glClear(GL_COLOR_BUFFER_BIT);
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+		glClear(GL_COLOR_BUFFER_BIT);
+		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		/*
 		 * If the application is left on for over an hour, reset the clock and autosave.
