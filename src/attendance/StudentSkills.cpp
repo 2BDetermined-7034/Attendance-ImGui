@@ -262,6 +262,67 @@ std::vector<StudentSkills::Category> StudentSkills::software = {
 	},
 };
 
+std::vector<StudentSkills::Category> StudentSkills::marketing = {
+	{
+		.name = "Canva",
+		.nodes = {
+			"Making small designs (i.e; Lion Burgers tickets, dine out cards, etc;)",
+			"Design posters for camps/social media",
+			"Design promotional posters for competitions",
+		}
+	},
+	{
+		.name = "Adobe Illustrator",
+		.nodes = {
+			"Trace a basic design",
+			"Sponsor logo magnets and stickers",
+			"T-shirt design",
+		}
+	},
+	{
+		.name = "Printing/Cutting",
+		.nodes = {
+			"Use a printer",
+			"Make a button using the button machine",
+			"Use the cricut machine to print stickers",
+			"Print magnets using digital arts room printer",
+		}
+	},
+	{
+		.name = "Facebook/Tik Tok/Instagram	",
+		.nodes = {
+			"Write a prompt for social media",
+			"Post on social media",
+		}
+	},
+	{
+		.name = "GoDaddy",
+		.nodes = {
+			"Update the main page of the website",
+			"Edit different sections of the website",
+		}
+	},
+	{
+		.name = "Newsletter (Team & ROAR)",
+		.nodes = {
+			"Write a prompt for the live and written ROAR",
+			"Submit a live and written ROAR blurb via gmail",
+			"Update The Hub",
+			"Update the newsletter",
+			"Send out the newsletter email",
+		}
+	},
+	{
+		.name = "Media Release and competition invite",
+		.nodes = {
+			"Write a competition invite prompt",
+			"Send a competition invitation",
+			"Write a media release prompt",
+			"Send a media release email",
+		}
+	}
+};
+
 std::vector<StudentSkills::Category> StudentSkills::outreach = {
 	{
 		.name = "General Skills",
@@ -432,6 +493,10 @@ void StudentSkills::renderSubteams(std::function<void(std::vector<Category>&, ms
 		}
 		if (ImGui::BeginTabItem("Software")) {
 			f(software, s.software);
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Marketing")) {
+			f(marketing, s.marketing);
 			ImGui::EndTabItem();
 		}
 		if (ImGui::BeginTabItem("Outreach")) {
