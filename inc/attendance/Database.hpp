@@ -41,6 +41,7 @@ public:
 		mstd::U8 outreach[5] = {0};
 		mstd::U8 business[4] = {0};
 		mstd::U8 safety[4] = {0};
+		mstd::U8 strategy[2] = {0};
 	};
 
 	std::vector<Student> students;

@@ -1,4 +1,4 @@
-#include "imgui/imgui_internal.h"
+#include <imgui/imgui.h>
 #include <attendance/StudentSkills.hpp>
 #include <imgui/imgui.h>
 #include <iostream>
@@ -448,6 +448,19 @@ std::vector<StudentSkills::Category> StudentSkills::safety = {
 	}
 };
 
+std::vector<StudentSkills::Category> StudentSkills::strategy = {
+	{
+		.name = "Scouting and Strategy",
+		.nodes = {
+			"Use scouting website",
+			"Accurately scouts qualitatively",
+			"Compiles and Analyzes data into match strategy",
+			"Analyzes games for strategy and priorities",
+			"Makes data-driven decisions"
+		}
+	}
+};
+
 void StudentSkills::render() {
 	using namespace mstd;
 
@@ -509,6 +522,10 @@ void StudentSkills::renderSubteams(std::function<void(std::vector<Category>&, ms
 		}
 		if (ImGui::BeginTabItem("Safety")) {
 			f(safety, s.safety);
+			ImGui::EndTabItem();
+		}
+		if (ImGui::BeginTabItem("Strategy")) {
+			f(strategy, s.strategy);
 			ImGui::EndTabItem();
 		}
 		ImGui::EndTabBar();
