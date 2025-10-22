@@ -175,7 +175,15 @@ mstd::Status Database::import(const std::string& filepath) {
 		HOURS = 3,
 		DATE = 4,
 		DETAILS = 5,
+
+		END = 6,
 	};
+
+	enum {
+		SOLVE,
+		CAMP,
+		OTHER,
+	} eventType;
 
 	U32 state = TIMESTAMP;
 
@@ -186,29 +194,27 @@ mstd::Status Database::import(const std::string& filepath) {
 	names.resize(students.size());
 
 	for (Size i = 0; i < students.size(); ++i) {
-		std::cout << students[i].lastName << std::endl;
-		std::cout << firstNames[students[i].firstName] + " " + lastNames[students[i].lastName] << std::endl;
-	}
-	return 0;
+		names[i] = firstNames[i] + " " + lastNames[i];
+		students[i].solveHours = 0.0f;
+		students[i].campHours = 0.0f;
+		students[i].otherHours = 0.0f;
 
-	Student* currentStudent;
+		students[i].solveEvents = 0;
+		students[i].camps = 0;
+		students[i].other = 0;
+	}
+
+	Student* currentStudent = nullptr;
 	for (Size i = dataStartOffset; i < source.size(); ++i) {
-		Bool controlCharacter = false;
-		if (source[i] == '\n') {
-			state = TIMESTAMP;
-			controlCharacter = true;
-		} else if (source[i] == ',') {
-			++state;
-			controlCharacter = true;
-		}
-		if (controlCharacter) {
-			++state;
+		if (source[i] == ',' || source[i] == '\n') {
 			end = source.data() + i;
 
 			std::string_view token = std::string_view(start + 1, end - 1);
+			std::cout << token << std::endl;
 
 			switch (state) {
 			case NAME:
+				std::cout << "^^^ THIS IS A NAME\n";
 				currentStudent = nullptr;
 				for (Size s = 0; s < names.size(); ++s) {
 					if (token == names[s]) {
@@ -216,18 +222,40 @@ mstd::Status Database::import(const std::string& filepath) {
 						break;
 					}
 				}
-			case TIMESTAMP:
+				break;
+			case ACTIVITY:
+				if (!currentStudent) {
+					break;
+				}
+				if (token == "Solve Event") {
+					++currentStudent->solveEvents;
+					eventType = SOLVE;
+				} else if (token == "Camp") {
+					++currentStudent->camps;
+					eventType = CAMP;
+				} else {
+					++currentStudent->other;
+					eventType = OTHER;
+				}
+				break;
+			case HOURS:
+				if (!currentStudent) {
+					break;
+				}
+				if (eventType == SOLVE) {
+					currentStudent->solveHours += std::stof(std::string(token));
+				} else if (eventType == CAMP) {
+					currentStudent->campHours += std::stof(std::string(token));
+				} else {
+					currentStudent->otherHours += std::stof(std::string(token));
+				}
+				break;
 			default:
 				break;
 			}
 
-			if (currentStudent) {
-				std::cout << firstNames[currentStudent->firstName] << std::endl;
-			} else {
-				std::cout << "NO STUDENT!!" << std::endl;
-			}
-
 			start = end + 1;
+			state = (state + 1) % END;
 		}
 	}
 
