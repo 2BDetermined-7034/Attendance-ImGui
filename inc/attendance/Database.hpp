@@ -15,6 +15,8 @@ public:
 	mstd::Status read(const std::string& filepath);
 	mstd::Status write(const std::string& filepath);
 
+	mstd::Status import(const std::string& filepath);
+
 	struct Student {
 	private:
 		mstd::U32 firstName;

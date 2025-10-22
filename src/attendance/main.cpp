@@ -61,6 +61,8 @@ int main() {
 	Database db;
 	db.read("database.db2");
 
+	db.import("service.csv");
+
 	AddStudent addStudent(db);
 	StudentSettings settings(db);
 	StudentSkills skills(db);

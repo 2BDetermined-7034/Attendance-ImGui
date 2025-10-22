@@ -143,3 +143,93 @@ mstd::Status Database::version1(std::ifstream& file, mstd::U16 revision) {
 
 	return 0;
 }
+
+mstd::Status Database::import(const std::string& filepath) {
+	using namespace mstd;
+
+	std::ifstream file(filepath);
+	if (!file.is_open()) {
+		logError(filepath, "");
+		return 1;
+	}
+
+	std::string source;
+	file.seekg(0, std::ios::end);
+	source.resize(file.tellg());
+	file.seekg(0, std::ios::beg);
+
+	file.read(source.data(), source.size());
+
+	Size dataStartOffset;
+	for (Size i = 0; i < source.size(); ++i) {
+		if (source[i] == '\n') {
+			dataStartOffset = i + 1;
+			break;
+		}
+	}
+
+	enum State : U32 {
+		TIMESTAMP = 0,
+		NAME = 1,
+		ACTIVITY = 2,
+		HOURS = 3,
+		DATE = 4,
+		DETAILS = 5,
+	};
+
+	U32 state = TIMESTAMP;
+
+	C8* start = source.data() + dataStartOffset;
+	C8* end;
+
+	std::vector<std::string> names;
+	names.resize(students.size());
+
+	for (Size i = 0; i < students.size(); ++i) {
+		std::cout << students[i].lastName << std::endl;
+		std::cout << firstNames[students[i].firstName] + " " + lastNames[students[i].lastName] << std::endl;
+	}
+	return 0;
+
+	Student* currentStudent;
+	for (Size i = dataStartOffset; i < source.size(); ++i) {
+		Bool controlCharacter = false;
+		if (source[i] == '\n') {
+			state = TIMESTAMP;
+			controlCharacter = true;
+		} else if (source[i] == ',') {
+			++state;
+			controlCharacter = true;
+		}
+		if (controlCharacter) {
+			++state;
+			end = source.data() + i;
+
+			std::string_view token = std::string_view(start + 1, end - 1);
+
+			switch (state) {
+			case NAME:
+				currentStudent = nullptr;
+				for (Size s = 0; s < names.size(); ++s) {
+					if (token == names[s]) {
+						currentStudent = students.data() + s;
+						break;
+					}
+				}
+			case TIMESTAMP:
+			default:
+				break;
+			}
+
+			if (currentStudent) {
+				std::cout << firstNames[currentStudent->firstName] << std::endl;
+			} else {
+				std::cout << "NO STUDENT!!" << std::endl;
+			}
+
+			start = end + 1;
+		}
+	}
+
+	return 0;
+}
