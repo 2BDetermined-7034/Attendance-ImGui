@@ -61,8 +61,6 @@ int main() {
 	Database db;
 	db.read("database.db2");
 
-	db.import("service.csv");
-
 	AddStudent addStudent(db);
 	StudentSettings settings(db);
 	StudentSkills skills(db);
@@ -93,6 +91,9 @@ int main() {
 			}
 			if (ImGui::MenuItem("Restore")) {
 				backupRestore(db);
+			}
+			if (ImGui::MenuItem("Import")) {
+				db.import("service.csv");
 			}
 			if (ImGui::MenuItem("Exit")) {
 				glfwSetWindowShouldClose(window, GLFW_TRUE);
