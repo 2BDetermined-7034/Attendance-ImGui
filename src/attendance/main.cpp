@@ -67,6 +67,9 @@ int main() {
 	StudentSelector selector(db, settings, skills);
 
 	glfwSetWindowFocusCallback(window, focusCallback);
+
+	db.addDate();
+	db.printShifts();
 	
 	I32 width, height;
 	while (!glfwWindowShouldClose(window)) {

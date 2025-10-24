@@ -5,6 +5,7 @@
 #include <functional>
 #include <mstd/memory>
 #include <GLFW/glfw3.h>
+#include <ctime>
 
 static void logError(const std::string& filepath, const std::string& error) {
 	std::cerr << errorText << "Could not open file \"" << filepath << "\" " << error << std::endl;
@@ -80,8 +81,10 @@ mstd::Status Database::write(const std::string& filepath) {
 	struct SubHeader {
 		U32 studentCount;
 		U32 stringChunkSize;
+		U32 dateCount;
 	} subHeader;
 	subHeader.studentCount = students.size();
+	subHeader.dateCount = dates.size();
 
 	/*
 	 * What is going on here?
@@ -109,6 +112,11 @@ mstd::Status Database::write(const std::string& filepath) {
 	file.write((C8*)&subHeader, sizeof(subHeader));
 	file.write((C8*)students.data(), students.size() * sizeof(Student));
 	file.write((C8*)first, subHeader.stringChunkSize);
+	file.write((C8*)dates.data(), dates.size() * sizeof(Date));
+
+	for (Size s = 0; s < shifts.size(); ++s) {
+		file.write((C8*)shifts[s].data(), shifts[s].size() * sizeof(Shift));
+	}
 
 	return 0;
 }
@@ -119,6 +127,7 @@ mstd::Status Database::version1(std::ifstream& file, mstd::U16 revision) {
 	struct SubHeader {
 		U32 studentCount;
 		U32 stringChunkSize;
+		U32 dateCount;
 	} subHeader;
 
 	file.read((C8*)&subHeader, sizeof(SubHeader));
@@ -139,6 +148,15 @@ mstd::Status Database::version1(std::ifstream& file, mstd::U16 revision) {
 		Student& s = students[i];
 		firstNames.push_back(std::string(stringChunk + s.firstName));
 		lastNames.push_back(std::string(stringChunk + s.lastName));
+	}
+
+	dates.resize(subHeader.dateCount);
+	shifts.resize(subHeader.dateCount);
+	file.read((C8*)dates.data(), dates.size() * sizeof(Date));
+
+	for (Size s = 0; s < shifts.size(); ++s) {
+		shifts[s].resize(subHeader.studentCount);
+		file.read((C8*)shifts[s].data(), shifts[s].size() * sizeof(Shift));
 	}
 
 	return 0;
@@ -260,4 +278,47 @@ mstd::Status Database::import(const std::string& filepath) {
 	}
 
 	return 0;
+}
+
+void Database::addDate() {
+	using namespace mstd;
+
+	Date today;
+
+	std::time_t timestamp;
+	std::time(&timestamp);
+
+	const tm* local = std::localtime(&timestamp);
+
+	today.year = local->tm_year + 1900;
+	today.month = local->tm_mon + 1;
+	today.day = local->tm_mday;
+
+	Date last = dates.back();
+	if (std::memcmp(&last, &today, sizeof(Date)) == 0) {
+		return;
+	}
+
+	dates.push_back(today);
+	shifts.push_back({});
+	shifts.back().resize(students.size());
+}
+
+
+void Database::printShifts() const {
+	using namespace mstd;
+
+	for (Size i = 0; i < dates.size(); ++i) {
+		std::cout << (U32)dates[i].year << "/" << (U32)dates[i].month << "/" << (U32)dates[i].day << " ";
+
+		for (Size j = 0; j < students.size(); ++j) {
+			Shift temp = shifts[i][j];
+			std::cout
+				<< (U32)temp.in.hour << ":" << (U32)temp.in.minute << " "
+				<< (U32)temp.out.hour << ":" << (U32)temp.out.minute << ";";
+		}
+
+		std::cout << std::endl;
+	}
+
 }

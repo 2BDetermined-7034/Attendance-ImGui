@@ -4,9 +4,7 @@
 #include <mstd/misc>
 #include <string>
 #include <vector>
-#include <variant>
 #include <functional>
-#include <chrono>
 
 class Database {
 public:
@@ -16,6 +14,10 @@ public:
 	mstd::Status write(const std::string& filepath);
 
 	mstd::Status import(const std::string& filepath);
+
+	void addDate();
+
+	void printShifts() const;
 
 	struct Student {
 	private:
@@ -46,8 +48,23 @@ public:
 		mstd::U8 strategy[2] = {0};
 	};
 
+	struct Timestamp {
+		mstd::U8 hour = 0xFF, minute;
+	};
+
+	struct Shift {
+		Timestamp in, out;
+	};
+
+	struct Date {
+		mstd::U16 year;
+		mstd::U8 month, day;
+	};
+
 	std::vector<Student> students;
 	std::vector<std::string> firstNames, lastNames;
+	std::vector<std::vector<Shift>> shifts;
+	std::vector<Date> dates;
 
 private:
 	mstd::Status version1(std::ifstream& file, mstd::U16 revision);
