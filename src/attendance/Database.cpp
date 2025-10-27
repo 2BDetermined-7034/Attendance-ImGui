@@ -5,6 +5,7 @@
 #include <functional>
 #include <mstd/memory>
 #include <GLFW/glfw3.h>
+#include <ctime>
 
 static void logError(const std::string& filepath, const std::string& error) {
 	std::cerr << errorText << "Could not open file \"" << filepath << "\" " << error << std::endl;
@@ -80,8 +81,10 @@ mstd::Status Database::write(const std::string& filepath) {
 	struct SubHeader {
 		U32 studentCount;
 		U32 stringChunkSize;
+		U32 dateCount;
 	} subHeader;
 	subHeader.studentCount = students.size();
+	subHeader.dateCount = dates.size();
 
 	/*
 	 * What is going on here?
@@ -109,6 +112,11 @@ mstd::Status Database::write(const std::string& filepath) {
 	file.write((C8*)&subHeader, sizeof(subHeader));
 	file.write((C8*)students.data(), students.size() * sizeof(Student));
 	file.write((C8*)first, subHeader.stringChunkSize);
+	file.write((C8*)dates.data(), dates.size() * sizeof(Date));
+
+	for (Size s = 0; s < shifts.size(); ++s) {
+		file.write((C8*)shifts[s].data(), shifts[s].size() * sizeof(Shift));
+	}
 
 	return 0;
 }
@@ -119,6 +127,7 @@ mstd::Status Database::version1(std::ifstream& file, mstd::U16 revision) {
 	struct SubHeader {
 		U32 studentCount;
 		U32 stringChunkSize;
+		U32 dateCount;
 	} subHeader;
 
 	file.read((C8*)&subHeader, sizeof(SubHeader));
@@ -141,5 +150,175 @@ mstd::Status Database::version1(std::ifstream& file, mstd::U16 revision) {
 		lastNames.push_back(std::string(stringChunk + s.lastName));
 	}
 
+	dates.resize(subHeader.dateCount);
+	shifts.resize(subHeader.dateCount);
+	file.read((C8*)dates.data(), dates.size() * sizeof(Date));
+
+	for (Size s = 0; s < shifts.size(); ++s) {
+		shifts[s].resize(subHeader.studentCount);
+		file.read((C8*)shifts[s].data(), shifts[s].size() * sizeof(Shift));
+	}
+
 	return 0;
+}
+
+mstd::Status Database::import(const std::string& filepath) {
+	using namespace mstd;
+
+	std::ifstream file(filepath);
+	if (!file.is_open()) {
+		logError(filepath, "");
+		return 1;
+	}
+
+	std::string source;
+	file.seekg(0, std::ios::end);
+	source.resize(file.tellg());
+	file.seekg(0, std::ios::beg);
+
+	file.read(source.data(), source.size());
+
+	Size dataStartOffset;
+	for (Size i = 0; i < source.size(); ++i) {
+		if (source[i] == '\n') {
+			dataStartOffset = i + 1;
+			break;
+		}
+	}
+
+	enum State : U32 {
+		TIMESTAMP = 0,
+		NAME = 1,
+		ACTIVITY = 2,
+		HOURS = 3,
+		DATE = 4,
+		DETAILS = 5,
+
+		END = 6,
+	};
+
+	enum {
+		SOLVE,
+		CAMP,
+		OTHER,
+	} eventType;
+
+	U32 state = TIMESTAMP;
+
+	C8* start = source.data() + dataStartOffset;
+	C8* end;
+
+	std::vector<std::string> names;
+	names.resize(students.size());
+
+	for (Size i = 0; i < students.size(); ++i) {
+		names[i] = firstNames[i] + " " + lastNames[i];
+		students[i].solveHours = 0.0f;
+		students[i].campHours = 0.0f;
+		students[i].otherHours = 0.0f;
+
+		students[i].solveEvents = 0;
+		students[i].camps = 0;
+		students[i].other = 0;
+	}
+
+	Student* currentStudent = nullptr;
+	for (Size i = dataStartOffset; i < source.size(); ++i) {
+		if (source[i] == ',' || source[i] == '\n') {
+			end = source.data() + i;
+
+			std::string_view token = std::string_view(start + 1, end - 1);
+			std::cout << token << std::endl;
+
+			switch (state) {
+			case NAME:
+				std::cout << "^^^ THIS IS A NAME\n";
+				currentStudent = nullptr;
+				for (Size s = 0; s < names.size(); ++s) {
+					if (token == names[s]) {
+						currentStudent = students.data() + s;
+						break;
+					}
+				}
+				break;
+			case ACTIVITY:
+				if (!currentStudent) {
+					break;
+				}
+				if (token == "Solve Event") {
+					++currentStudent->solveEvents;
+					eventType = SOLVE;
+				} else if (token == "Camp") {
+					++currentStudent->camps;
+					eventType = CAMP;
+				} else {
+					++currentStudent->other;
+					eventType = OTHER;
+				}
+				break;
+			case HOURS:
+				if (!currentStudent) {
+					break;
+				}
+				if (eventType == SOLVE) {
+					currentStudent->solveHours += std::stof(std::string(token));
+				} else if (eventType == CAMP) {
+					currentStudent->campHours += std::stof(std::string(token));
+				} else {
+					currentStudent->otherHours += std::stof(std::string(token));
+				}
+				break;
+			default:
+				break;
+			}
+
+			start = end + 1;
+			state = (state + 1) % END;
+		}
+	}
+
+	return 0;
+}
+
+void Database::addDate() {
+	using namespace mstd;
+
+	Date today;
+
+	std::time_t timestamp;
+	std::time(&timestamp);
+
+	const tm* local = std::localtime(&timestamp);
+
+	today.year = local->tm_year + 1900;
+	today.month = local->tm_mon + 1;
+	today.day = local->tm_mday;
+
+	Date last = dates.back();
+	if (std::memcmp(&last, &today, sizeof(Date)) == 0) {
+		return;
+	}
+
+	dates.push_back(today);
+	shifts.push_back({});
+	shifts.back().resize(students.size());
+}
+
+
+void Database::printShifts() const {
+	using namespace mstd;
+
+	for (Size i = 0; i < dates.size(); ++i) {
+		std::cout << (U32)dates[i].year << "/" << (U32)dates[i].month << "/" << (U32)dates[i].day << " ";
+
+		for (Size j = 0; j < students.size(); ++j) {
+			Shift temp = shifts[i][j];
+			std::cout
+				<< (U32)temp.in.hour << ":" << (U32)temp.in.minute << " "
+				<< (U32)temp.out.hour << ":" << (U32)temp.out.minute << ";";
+		}
+
+		std::cout << std::endl;
+	}
+
 }

@@ -3,6 +3,7 @@
 #include <imgui/imgui.h>
 #include <algorithm>
 #include <GLFW/glfw3.h>
+#include <ctime>
 
 void StudentSelector::updateSearch() {
 	using namespace mstd;
@@ -93,19 +94,48 @@ void StudentSelector::toggleAttendance(mstd::Size student) {
 }
 
 void StudentSelector::signIn(mstd::Size student) {
+	using namespace mstd;
+
 	if (students[student].present) return;
 
 	students[student].signInTime = glfwGetTime();
 	students[student].present = true;
+
+	db.addDate();
+	if (db.shifts.back()[student].in.hour == 0xFF) {
+		std::time_t timestamp;
+		std::time(&timestamp);
+
+		const tm* local = std::localtime(&timestamp);
+
+		Database::Timestamp in = {
+			.hour = U8(local->tm_hour),
+			.minute = U8(local->tm_min)
+		};
+		db.shifts.back()[student].in = in;
+	}
 }
 
 void StudentSelector::signOut(mstd::Size student) {
+	using namespace mstd;
+
 	if (!students[student].present) return;
 
 	db.students[student].labHours += (glfwGetTime() - students[student].signInTime) / 3600.0f;
 
 	students[student].signInTime = 0.0f;
 	students[student].present = false;
+
+	std::time_t timestamp;
+	std::time(&timestamp);
+
+	const tm* local = std::localtime(&timestamp);
+
+	Database::Timestamp out = {
+		.hour = U8(local->tm_hour),
+		.minute = U8(local->tm_min)
+	};
+	db.shifts.back()[student].out = out;
 }
 
 /*

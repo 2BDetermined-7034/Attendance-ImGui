@@ -67,6 +67,9 @@ int main() {
 	StudentSelector selector(db, settings, skills);
 
 	glfwSetWindowFocusCallback(window, focusCallback);
+
+	db.addDate();
+	db.printShifts();
 	
 	I32 width, height;
 	while (!glfwWindowShouldClose(window)) {
@@ -91,6 +94,9 @@ int main() {
 			}
 			if (ImGui::MenuItem("Restore")) {
 				backupRestore(db);
+			}
+			if (ImGui::MenuItem("Import")) {
+				db.import("service.csv");
 			}
 			if (ImGui::MenuItem("Exit")) {
 				glfwSetWindowShouldClose(window, GLFW_TRUE);
