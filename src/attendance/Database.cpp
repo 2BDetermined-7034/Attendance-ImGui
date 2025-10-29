@@ -294,9 +294,11 @@ void Database::addDate() {
 	today.month = local->tm_mon + 1;
 	today.day = local->tm_mday;
 
-	Date last = dates.back();
-	if (std::memcmp(&last, &today, sizeof(Date)) == 0) {
-		return;
+	if (dates.size()) {
+		Date last = dates.back();
+		if (std::memcmp(&last, &today, sizeof(Date)) == 0) {
+			return;
+		}
 	}
 
 	dates.push_back(today);
