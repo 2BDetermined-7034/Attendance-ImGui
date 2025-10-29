@@ -280,6 +280,37 @@ mstd::Status Database::import(const std::string& filepath) {
 	return 0;
 }
 
+mstd::Status Database::exportCSV(const std::string& filepath) {
+	using namespace mstd;
+
+	std::ofstream file(filepath, std::ios::trunc);
+	if (!file.is_open()) {
+		logError(filepath, "");
+		return 1;
+	}
+
+	file << ",";
+	for (auto& d : dates) {
+		file << "\"" << U32(d.month) << "/" << U32(d.day) << "/" << U32(d.year) << " IN\",";
+		file << "\"" << U32(d.month) << "/" << U32(d.day) << "/" << U32(d.year) << " OUT\",";
+	}
+	file << "\n";
+
+	for (Size s = 0; s < students.size(); ++s) {
+		file << firstNames[s] << " " << lastNames[s] << ",";
+
+		for (Size d = 0; d < shifts.size(); ++d) {
+			Shift& shift = shifts[d][s];
+			file << U32(shift.in.hour) << ":" << U32(shift.in.minute) << ",";
+			file << U32(shift.out.hour) << ":" << U32(shift.out.minute) << ",";
+		}
+
+		file << "\n";
+	}
+
+	return 0;
+}
+
 void Database::addDate() {
 	using namespace mstd;
 
@@ -294,9 +325,11 @@ void Database::addDate() {
 	today.month = local->tm_mon + 1;
 	today.day = local->tm_mday;
 
-	Date last = dates.back();
-	if (std::memcmp(&last, &today, sizeof(Date)) == 0) {
-		return;
+	if (dates.size()) {
+		Date last = dates.back();
+		if (std::memcmp(&last, &today, sizeof(Date)) == 0) {
+			return;
+		}
 	}
 
 	dates.push_back(today);

@@ -14,6 +14,7 @@ public:
 	mstd::Status write(const std::string& filepath);
 
 	mstd::Status import(const std::string& filepath);
+	mstd::Status exportCSV(const std::string& filepath);
 
 	void addDate();
 
