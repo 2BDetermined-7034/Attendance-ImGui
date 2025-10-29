@@ -301,6 +301,11 @@ mstd::Status Database::exportCSV(const std::string& filepath) {
 
 		for (Size d = 0; d < shifts.size(); ++d) {
 			Shift& shift = shifts[d][s];
+			if (shift.in.hour == 255) {
+				file << "ABSENT,ABSENT,";
+				continue;
+			}
+
 			file << U32(shift.in.hour) << ":" << U32(shift.in.minute) << ",";
 			file << U32(shift.out.hour) << ":" << U32(shift.out.minute) << ",";
 		}
