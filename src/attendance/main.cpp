@@ -97,6 +97,9 @@ int main() {
 			if (ImGui::MenuItem("Import")) {
 				db.import("service.csv");
 			}
+			if (ImGui::MenuItem("Export")) {
+				db.exportCSV("attendance.csv");
+			}
 			if (ImGui::MenuItem("Exit")) {
 				glfwSetWindowShouldClose(window, GLFW_TRUE);
 			}
