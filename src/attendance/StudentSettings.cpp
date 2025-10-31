@@ -57,6 +57,11 @@ void StudentSettings::renderAdmin() {
 				db.students.erase(db.students.begin() + studentIndex);
 				db.firstNames.erase(db.firstNames.begin() + studentIndex);
 				db.lastNames.erase(db.lastNames.begin() +  studentIndex);
+
+				for (Size d = 0; d < db.shifts.size(); ++d) {
+					db.shifts[d].erase(db.shifts[d].begin() + studentIndex);
+				}
+
 				attemptingToDelete = 0;
 				enabled = 0;
 				std::fill(deleteQuery, deleteQuery + sizeof(deleteQuery), '\0');

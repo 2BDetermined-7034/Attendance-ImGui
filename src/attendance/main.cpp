@@ -21,6 +21,8 @@ void focusCallback(GLFWwindow* window, mstd::I32 f) {
 	focused = f;
 }
 
+constexpr mstd::U64 hex = 0x6c6c69724b406931;
+
 int main() {
 	using namespace mstd;
 
@@ -128,7 +130,7 @@ int main() {
 						ImGuiInputTextFlags_Password | ImGuiInputTextFlags_EnterReturnsTrue
 					)
 				) {
-					if (password == std::string("7034")) {
+					if (password == std::string_view((C8*)&hex, 8)) {
 						settings.hasAdmin = true;
 						skills.hasAdmin = true;
 					}
