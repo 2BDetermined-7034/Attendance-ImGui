@@ -37,7 +37,7 @@ mstd::Status Database::read(const std::string& filepath) {
 		U16 revision; // Revision
 	} header;
 
-	std::ifstream file(filepath);
+	std::ifstream file(filepath, std::ios::binary);
 	if (!file.is_open()) {
 		logError(filepath, "");
 		return 1;
@@ -66,7 +66,7 @@ mstd::Status Database::read(const std::string& filepath) {
 mstd::Status Database::write(const std::string& filepath) {
 	using namespace mstd;
 
-	std::ofstream file(filepath, std::ios::trunc);
+	std::ofstream file(filepath, std::ios::trunc | std::ios::binary);
 	if (!file.is_open()) {
 		logError(filepath, "");
 		return 1;

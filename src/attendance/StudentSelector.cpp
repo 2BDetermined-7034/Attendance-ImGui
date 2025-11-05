@@ -66,7 +66,6 @@ void StudentSelector::render() {
 				toggleAttendance(i);
 			}
 		}
-		continue;
 
 		ImGui::PushID(name.c_str());
 
