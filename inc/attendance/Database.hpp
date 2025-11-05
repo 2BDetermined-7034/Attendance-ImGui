@@ -16,6 +16,8 @@ public:
 	mstd::Status import(const std::string& filepath);
 	mstd::Status exportCSV(const std::string& filepath);
 
+	mstd::Status importNames(const std::string& filepath);
+
 	void addDate();
 
 	void printShifts() const;
