@@ -173,10 +173,21 @@ mstd::Status Database::import(const std::string& filepath) {
 
 	std::string source;
 	file.seekg(0, std::ios::end);
-	source.resize(file.tellg());
+	source.reserve(file.tellg());
 	file.seekg(0, std::ios::beg);
 
-	file.read(source.data(), source.size());
+	while (!file.eof()) {
+		C8 c;
+		file.read(&c, 1);
+		
+		if (c != '\r') {
+			source.push_back(c);
+		}
+	}
+
+	if (source.back() != '\n') {
+		source.push_back('\n');
+	}
 
 	Size dataStartOffset;
 	for (Size i = 0; i < source.size(); ++i) {
@@ -311,6 +322,68 @@ mstd::Status Database::exportCSV(const std::string& filepath) {
 		}
 
 		file << "\n";
+	}
+
+	return 0;
+}
+
+mstd::Status Database::importNames(const std::string& filepath) {
+	using namespace mstd;
+
+	std::ifstream file(filepath);
+	if (!file.is_open()) {
+		logError(filepath, "");
+		return 1;
+	}
+
+	std::string source;
+	file.seekg(0, std::ios::end);
+	source.reserve(file.tellg());
+	file.seekg(0, std::ios::beg);
+
+	while (!file.eof()) {
+		C8 c;
+		file.read(&c, 1);
+		
+		if (c != '\r') {
+			source.push_back(c);
+		}
+	}
+
+	if (source.back() != '\n') {
+		source.push_back('\n');
+	}
+
+	enum State : U32 {
+		FIRST = 0,
+		LAST = 1,
+
+		END = 2
+	};
+
+	U32 state = FIRST;
+	C8* start = source.data();
+	C8* end;
+
+	for (Size i = 0; i < source.size(); ++i) {
+		if (source[i] == ',' || source[i] == '\n') {
+			end = source.data() + i;
+
+			std::string_view token = std::string_view(start, end);
+			if (state == FIRST) {
+				firstNames.push_back(std::string(token));
+			} else {
+				lastNames.push_back(std::string(token));
+				students.push_back({});
+
+				for (Size s = 0; s < shifts.size(); ++s) {
+					shifts[s].push_back({0xFF, 0});
+				}
+			}
+
+			start = end + 1;
+			state = (state + 1) % END;
+		}
 	}
 
 	return 0;

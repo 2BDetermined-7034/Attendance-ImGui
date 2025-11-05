@@ -113,6 +113,9 @@ int main() {
 					addStudent.render();
 					ImGui::EndMenu();
 				}
+				if (ImGui::MenuItem("Import Students")) {
+					db.importNames("roster.csv");
+				}
 				if (ImGui::MenuItem("Sign All Out")) {
 					for (Size i = 0; i < db.students.size(); ++i) {
 						selector.signOut(i);
@@ -155,7 +158,9 @@ int main() {
 		);
 
 		ImGui::SetWindowPos({0, 32});
-		ImGui::SetWindowSize(io.DisplaySize);
+		auto windowSize = io.DisplaySize;
+		windowSize.y -= 32;
+		ImGui::SetWindowSize(windowSize);
 
 		selector.render();
 		settings.render();
