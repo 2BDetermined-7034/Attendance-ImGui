@@ -13,6 +13,9 @@
 #include <attendance/StudentSettings.hpp>
 #include <attendance/StudentSkills.hpp>
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <attendance/stb_image.h>
+
 #include <iostream>
 #include <functional>
 
@@ -32,6 +35,17 @@ int main() {
 	}
 
 	GLFWwindow* window = glfwCreateWindow(800, 600, "Attendance", nullptr, nullptr);
+
+	GLFWimage windowIcon;
+	int iconWidth, iconHeight, iconComponents;
+	U8* icon = stbi_load("resources/icon.png", &iconWidth, &iconHeight, &iconComponents, 4);
+
+	windowIcon.width = iconWidth;
+	windowIcon.height = iconHeight;
+	windowIcon.pixels = icon;
+	glfwSetWindowIcon(window, 1, &windowIcon);
+
+	stbi_image_free(icon);
 
 	glfwMakeContextCurrent(window);
 	if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {

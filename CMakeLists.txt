@@ -36,6 +36,7 @@ function(add_resource path)
 endfunction()
 
 add_resource(font.ttf)
+add_resource(icon.png)
 
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
