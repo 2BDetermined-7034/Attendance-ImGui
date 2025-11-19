@@ -28,12 +28,15 @@ private:
 	void renderStudent();
 
 	mstd::Size studentIndex;
-	mstd::Bool attemptingToDelete;
 	mstd::Bool enabled;
+	mstd::U8 attemptingToDelete : 1;
+	mstd::U8 attemptingToRename : 1;
 
 	Database& db;
 	std::string name;
 	char deleteQuery[128];
+	char firstQuery[64];
+	char lastQuery[64];
 };
 
 #endif

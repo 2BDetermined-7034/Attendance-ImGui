@@ -43,6 +43,35 @@ void StudentSettings::renderAdmin() {
 	ImGui::SeparatorText("Danger Zone");
 	ImGui::PopStyleColor();
 	ImGui::PopStyleColor();
+	if (ImGui::Button("Rename")) {
+		attemptingToRename ^= 1;
+	}
+	if (attemptingToRename) {
+		std::string& firstName = db.firstNames[studentIndex];
+		std::string& lastName = db.lastNames[studentIndex];
+
+		/*
+		* Copy from the string beginning to the string end + 1
+		* in order to also encapsulate the null byte '\0'.
+		* We do this so that we trick ImGui to think that the query
+		* buffers have been properly cleared when in fact they were not.
+		*/
+		std::copy(firstName.begin(), firstName.end() + 1, firstQuery);
+		std::copy(lastName.begin(), lastName.end() + 1, lastQuery);
+		ImGui::InputText("First ", firstQuery, 64);
+		ImGui::InputText("Last ", lastQuery, 64);
+		if (ImGui::Button("Ok")) {
+			firstName.resize(std::strlen(firstQuery));
+			lastName.resize(std::strlen(lastQuery));
+
+			std::copy(firstQuery, firstQuery + firstName.size(), firstName.begin());
+			std::copy(lastQuery, lastQuery + lastName.size(), lastName.begin());
+		}
+		ImGui::SameLine();
+		if (ImGui::Button("Cancel")) {
+			attemptingToDelete = 0;
+		}
+	}
 	if (ImGui::Button("Delete")) {
 		attemptingToDelete ^= 1;
 	}
