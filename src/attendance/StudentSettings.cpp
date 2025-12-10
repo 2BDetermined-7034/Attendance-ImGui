@@ -1,12 +1,17 @@
 #include <attendance/StudentSettings.hpp>
 #include <iostream>
+#include <cstring>
 
 #include <imgui/imgui.h>
 
 void StudentSettings::render() {
 	using namespace mstd;
 
-	if (!enabled) return;
+	if (!enabled) {
+		attemptingToRename = 0;
+		attemptingToDelete = 0;
+		return;
+	}
 	
 	ImGui::SetNextWindowSizeConstraints({400, 300}, {FLT_MAX, FLT_MAX});
 	if (ImGui::Begin(name.c_str(), &enabled)) {
@@ -43,13 +48,12 @@ void StudentSettings::renderAdmin() {
 	ImGui::SeparatorText("Danger Zone");
 	ImGui::PopStyleColor();
 	ImGui::PopStyleColor();
+	std::string& firstName = db.firstNames[studentIndex];
+	std::string& lastName = db.lastNames[studentIndex];
+
+	ImGui::PushID(name.c_str());
 	if (ImGui::Button("Rename")) {
 		attemptingToRename ^= 1;
-	}
-	if (attemptingToRename) {
-		std::string& firstName = db.firstNames[studentIndex];
-		std::string& lastName = db.lastNames[studentIndex];
-
 		/*
 		* Copy from the string beginning to the string end + 1
 		* in order to also encapsulate the null byte '\0'.
@@ -58,20 +62,25 @@ void StudentSettings::renderAdmin() {
 		*/
 		std::copy(firstName.begin(), firstName.end() + 1, firstQuery);
 		std::copy(lastName.begin(), lastName.end() + 1, lastQuery);
-		ImGui::InputText("First ", firstQuery, 64);
-		ImGui::InputText("Last ", lastQuery, 64);
+		firstQuery[firstName.size()] = '\0';
+		lastQuery[firstName.size()] = '\0';
+	}
+	if (attemptingToRename) {
+		ImGui::InputText("First ", firstQuery, sizeof(firstQuery) - 1);
+		ImGui::InputText("Last ", lastQuery, sizeof(lastQuery) - 1);
 		if (ImGui::Button("Ok")) {
-			firstName.resize(std::strlen(firstQuery));
-			lastName.resize(std::strlen(lastQuery));
+			firstName = firstQuery;
+			lastName = lastQuery;
 
-			std::copy(firstQuery, firstQuery + firstName.size(), firstName.begin());
-			std::copy(lastQuery, lastQuery + lastName.size(), lastName.begin());
+			name = firstName + " " + lastName;
 		}
 		ImGui::SameLine();
 		if (ImGui::Button("Cancel")) {
-			attemptingToDelete = 0;
+			attemptingToRename = 0;
 		}
 	}
+	ImGui::PopID();
+
 	if (ImGui::Button("Delete")) {
 		attemptingToDelete ^= 1;
 	}
@@ -80,7 +89,7 @@ void StudentSettings::renderAdmin() {
 		ImGui::InputText(
 			(("Type \"") + deleteText + ("\" to continue")).c_str(),
 			deleteQuery,
-			128
+			sizeof(deleteQuery) - 1
 		);
 		if (ImGui::Button("Ok")) {
 			if (deleteText == deleteQuery) {
