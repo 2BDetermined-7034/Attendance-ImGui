@@ -189,7 +189,7 @@ mstd::Status Database::import(const std::string& filepath) {
 		source.push_back('\n');
 	}
 
-	Size dataStartOffset;
+	Size dataStartOffset = 0;
 	for (Size i = 0; i < source.size(); ++i) {
 		if (source[i] == '\n') {
 			dataStartOffset = i + 1;
@@ -233,12 +233,16 @@ mstd::Status Database::import(const std::string& filepath) {
 		students[i].other = 0;
 	}
 
+	Bool insideQuote = false;
 	Student* currentStudent = nullptr;
 	for (Size i = dataStartOffset; i < source.size(); ++i) {
-		if (source[i] == ',' || source[i] == '\n') {
+		if (source[i] == '\"') {
+			insideQuote ^= 1; 
+		}
+		if ((source[i] == ',' || source[i] == '\n') && !insideQuote) {
 			end = source.data() + i;
 
-			std::string_view token = std::string_view(start + 1, end - 1);
+			std::string_view token = std::string_view(start, end);
 			std::cout << token << std::endl;
 
 			switch (state) {
