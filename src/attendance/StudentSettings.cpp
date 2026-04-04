@@ -117,7 +117,8 @@ void StudentSettings::renderStudent() {
 	using namespace mstd;
 
 	ImGui::SeparatorText("Lab");
-	ImGui::Text("Lab hours = %f", db.students[studentIndex].labHours);
+	ImGui::Text("Lab hours = %d\h %d\m", (I32)db.students[studentIndex].labHours,
+		I32((db.students[studentIndex].labHours - std::floor(db.students[studentIndex].labHours)) * 60));
 	ImGui::SeparatorText("Service");
 	ImGui::Text("SOLVE hours = %f", db.students[studentIndex].solveHours);
 	ImGui::Text("Camp hours = %f", db.students[studentIndex].campHours);

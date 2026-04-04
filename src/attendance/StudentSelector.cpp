@@ -67,7 +67,7 @@ void StudentSelector::render() {
 			}
 		}
 
-		ImGui::PushID(name.c_str());
+		ImGui::PushID(i);
 
 		ImGui::SameLine();
 		ImGui::PushStyleVar(ImGuiStyleVar_ButtonTextAlign, {0.3, 0});
@@ -125,6 +125,14 @@ void StudentSelector::signOut(mstd::Size student) {
 
 	students[student].signInTime = 0.0f;
 	students[student].present = false;
+
+	updateSignOutTime(student);
+}
+
+void StudentSelector::updateSignOutTime(mstd::Size student) {
+	using namespace mstd;
+
+	if (!students[student].present) return;
 
 	std::time_t timestamp;
 	std::time(&timestamp);

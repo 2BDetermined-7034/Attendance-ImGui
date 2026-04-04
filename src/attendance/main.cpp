@@ -12,6 +12,7 @@
 #include <attendance/AddStudent.hpp>
 #include <attendance/StudentSettings.hpp>
 #include <attendance/StudentSkills.hpp>
+#include <attendance/timer.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <attendance/stb_image.h>
@@ -24,7 +25,7 @@ void focusCallback(GLFWwindow* window, mstd::I32 f) {
 	focused = f;
 }
 
-constexpr mstd::U64 hex = 0x6c6c69724b406931;
+constexpr mstd::U64 hex = 0x264b43305234576e;
 
 int main() {
 	using namespace mstd;
@@ -85,12 +86,38 @@ int main() {
 	glfwSetWindowFocusCallback(window, focusCallback);
 
 	db.addDate();
+
+	timer([]() {
+		std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAA\n";
+	});
 	
-	I32 width, height;
+	Bool windowed = 1;
+	I32 oldX, oldY;
+	I32 oldWidth, oldHeight;
+	U32 f11State = false;
 	while (!glfwWindowShouldClose(window)) {
 		glfwPollEvents();
 		if (!focused) {
 			continue;
+		}
+
+		if (glfwGetKey(window, GLFW_KEY_F11)) {
+			++f11State;
+		} else {
+			f11State = 0;
+		}
+		if (f11State == 1) {
+			windowed ^= 1;
+
+			if (windowed) {
+				glfwSetWindowMonitor(window, nullptr, oldX, oldY, oldWidth, oldHeight, GLFW_DONT_CARE);
+			} else {
+				glfwGetFramebufferSize(window, &oldWidth, &oldHeight);
+				glfwGetWindowPos(window, &oldX, &oldY);
+				GLFWmonitor* monitor = glfwGetPrimaryMonitor();
+				const GLFWvidmode* mode = glfwGetVideoMode(monitor);
+				glfwSetWindowMonitor(window, monitor, 0, 0, mode->width, mode->height, mode->refreshRate);
+			}
 		}
 
 		ImGui_ImplOpenGL3_NewFrame();
@@ -107,8 +134,10 @@ int main() {
 			if (ImGui::MenuItem("Backup")) {
 				backupCreate(db);
 			}
-			if (ImGui::MenuItem("Restore")) {
-				backupRestore(db);
+			if (settings.hasAdmin) {
+				if (ImGui::MenuItem("Restore")) {
+					backupRestore(db);
+				}
 			}
 			if (ImGui::MenuItem("Import")) {
 				db.import("service.csv");
@@ -187,11 +216,14 @@ int main() {
 		ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
 		/*
-		 * If the application is left on for over an hour, reset the clock and autosave.
+		 * Autosave every 15 min.
 		 * TODO Move this logic to execute after signing everyone out at ~9-10 automatically
 		 */
-		if (glfwGetTime() > 3600.0f) {
+		if (glfwGetTime() > 3600.0f / 4.0f) {
 			selector.resetClock();
+			for (Size i = 0; i < db.students.size(); ++i) {
+				selector.updateSignOutTime(i);
+			}
 			db.write("database.db2");
 		}
 

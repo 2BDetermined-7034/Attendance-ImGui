@@ -18,6 +18,7 @@ public:
 	void toggleAttendance(mstd::Size student);
 	void signIn(mstd::Size student);
 	void signOut(mstd::Size student);
+	void updateSignOutTime(mstd::Size student);
 	void resetClock();
 
 private:
